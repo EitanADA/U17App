@@ -15,11 +15,15 @@ export default function App() {
 
   }
 
-  if (randomSymbol == 1 || randomSymbol == 3) {
+  if (randomSymbol == 1) {
     if (randomValue2 > randomValue) {
       newNumbers()
     }
-    else if (randomSymbol == 3 && randomValue2 % randomValue != 0) {
+  }
+  //if (randomSymbol == 3 && (Math.floor(randomValue / randomValue2) == (randomValue / randomValue2)) && randomValue > randomValue2) {
+  if (randomSymbol == 3) {
+    if (randomValue2 > randomValue || Math.floor(randomValue / randomValue2) != (randomValue / randomValue2)) {
+      console.log(Math.floor(randomValue / randomValue2), randomValue / randomValue2);
       newNumbers()
     }
   }
@@ -27,6 +31,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>{randomValue} {symbolTypes[randomSymbol]} {randomValue2}</Text>
+      <Text>{ randomValue / randomValue2 }</Text>
 
       <View style={styles.inputContainer}>
         <TextInput style={styles.inputBox}></TextInput>
