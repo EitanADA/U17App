@@ -12,8 +12,21 @@ export default function App() {
   });
   const symbolTypes = ["+","-","×","÷"];
   const [solution, setSolution] = useState('');
-
   const [userAnswer, setUserAnswer] = useState('');
+  const [feedback, setFeedback] = useState('');
+
+  function checkAnswer() {
+    if (userAnswer == solution){
+      setFeedback('correct 🎉');
+      setTimeout(function(){setUserAnswer("")}, 1000);
+      setTimeout(function(){setFeedback('')}, 1000);
+      setTimeout(function(){newNumbers()}, 1100);
+    }
+    else {
+      console.log('incorrect ❌')
+      setTimeout(setUserAnswer(""));
+    }
+  }
   
   function newNumbers() {
     let num1 = Math.floor(Math.random() * 12) + 1;
@@ -43,9 +56,10 @@ export default function App() {
     }
   }, [question])
 
-  useEffect(() => {
-    console.log(userAnswer)
-  }, [userAnswer])
+  // useEffect(() => {
+  //   console.log(userAnswer)
+  //   checkAnswer()
+  // }, [userAnswer])
 
   return (
     <View style={styles.container}>
@@ -61,9 +75,10 @@ export default function App() {
         defaultValue={text}></TextInput>
         <Button
         title="Enter" 
-        onPress={newNumbers}
+        onPress={checkAnswer}
         />
       </View>
+      <Text>{ feedback }</Text>
       <StatusBar style="auto" />
     </View>
   );
