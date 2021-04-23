@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, Component } from 'react';
-import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, Alert, Keyboard } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, Alert, Keyboard, } from 'react-native';
 
 export default function App() {
   const [text, setText] = useState('');
@@ -11,6 +12,8 @@ export default function App() {
   });
   const symbolTypes = ["+","-","×","÷"];
   const [solution, setSolution] = useState('');
+
+  const [userAnswer, setUserAnswer] = useState('');
   
   function newNumbers() {
     let num1 = Math.floor(Math.random() * 12) + 1;
@@ -40,6 +43,10 @@ export default function App() {
     }
   }, [question])
 
+  useEffect(() => {
+    console.log(userAnswer)
+  }, [userAnswer])
+
   return (
     <View style={styles.container}>
       
@@ -48,8 +55,9 @@ export default function App() {
 
       <View style={styles.inputContainer}>
         <TextInput style={styles.inputBox}
+        value={userAnswer}
         placeholder="Enter your answer here!"
-        onSubmitEditing={text => setText(text)}
+        onChangeText={userAnswer => setUserAnswer(userAnswer)}
         defaultValue={text}></TextInput>
         <Button
         title="Enter" 
