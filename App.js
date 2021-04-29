@@ -2,8 +2,31 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, Component } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, Alert, Keyboard, } from 'react-native';
+import 'react-native-gesture-handler';
+import { NavigationContainer, StackActions } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-export default function App() {
+function HomeScreen({ navigation }) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Maths Game</Text>
+    </View>
+  );
+}
+
+function LevelPage({ navigation }) {
+  return (
+    <Button
+      title="Level 0"
+      onPress={() =>
+        navigation.navigate('QuestionPage')
+      }
+    />
+  );
+}
+
+function QuestionPage({ navigation }) {
+ 
   const [text, setText] = useState('');
   const [question, setQuestion] = useState({
     "randomValue" : null,
@@ -23,8 +46,9 @@ export default function App() {
       setTimeout(function(){newNumbers()}, 1100);
     }
     else {
-      console.log('incorrect ❌')
-      setTimeout(setUserAnswer(""));
+      setFeedback('incorrect ❌')
+      setTimeout(function(){setUserAnswer("")}, 1000);
+      setTimeout(function(){setFeedback('')}, 1000);
     }
   }
   
@@ -56,31 +80,49 @@ export default function App() {
     }
   }, [question])
 
-  // useEffect(() => {
-  //   console.log(userAnswer)
-  //   checkAnswer()
-  // }, [userAnswer])
+  return (
+  <View style={styles.container}>
+  <Text>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
+  <Text>{ solution }</Text>
+    <View style={styles.inputContainer}>
+      <TextInput style={styles.inputBox}
+      value={userAnswer}
+      placeholder="Enter your answer here!"
+      onChangeText={userAnswer => setUserAnswer(userAnswer)}
+      defaultValue={text}
+      autoFocus={true}
+      keyboardType={'numeric'}>
+      </TextInput>
+      <Button
+      title="Enter" 
+      onPress={checkAnswer}
+      />
+    </View>
+  <Text>{ feedback }</Text>
+  <StatusBar style="auto" />
+  </View>
+  );
+}
+
+function ScorePage({ navigation }) {
+
+}
+
+export default function App() {
+
+  const Stack = createStackNavigator();
 
   return (
-    <View style={styles.container}>
-      
-      <Text>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
-      <Text>{ solution }</Text>
-
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.inputBox}
-        value={userAnswer}
-        placeholder="Enter your answer here!"
-        onChangeText={userAnswer => setUserAnswer(userAnswer)}
-        defaultValue={text}></TextInput>
-        <Button
-        title="Enter" 
-        onPress={checkAnswer}
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+        name="Home"
+        component={LevelPage}
+        options={{ title: 'Welcome' }}
         />
-      </View>
-      <Text>{ feedback }</Text>
-      <StatusBar style="auto" />
-    </View>
+        
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
