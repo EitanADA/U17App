@@ -5,28 +5,49 @@ import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, Alert, Keyboar
 import 'react-native-gesture-handler';
 import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { diff } from 'react-native-reanimated';
 
 function HomeScreen({ navigation }) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Maths Game</Text>
+      <Button
+      title="Play"
+      onPress={() =>
+        navigation.navigate('Levels')
+      }
+      />
     </View>
   );
 }
 
 function LevelPage({ navigation }) {
   return (
+    <View>
     <Button
-      title="Level 0"
+      title="Easy"
       onPress={() =>
-        navigation.navigate('QuestionPage')
+        navigation.navigate('Questions', {difficulty: 0,})
       }
     />
+    <Button
+      title="Medium"
+      onPress={() =>
+        navigation.navigate('Questions', {difficulty: 1,})
+      }
+    />
+    <Button
+      title="Hard"
+      onPress={() =>
+        navigation.navigate('Questions', {difficulty: 2,})
+      }
+    />
+    </View>
   );
 }
 
-function QuestionPage({ navigation }) {
- 
+function QuestionPage({ route, navigation }) {
+  const { difficulty } = route.params;
   const [text, setText] = useState('');
   const [question, setQuestion] = useState({
     "randomValue" : null,
@@ -82,6 +103,7 @@ function QuestionPage({ navigation }) {
 
   return (
   <View style={styles.container}>
+  <Text>difficulty: {JSON.stringify(difficulty)}</Text>
   <Text>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
   <Text>{ solution }</Text>
     <View style={styles.inputContainer}>
@@ -99,7 +121,7 @@ function QuestionPage({ navigation }) {
       />
     </View>
   <Text>{ feedback }</Text>
-  <StatusBar style="auto" />
+  {/* <StatusBar style="auto" /> */}
   </View>
   );
 }
@@ -117,10 +139,19 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen
         name="Home"
-        component={LevelPage}
-        options={{ title: 'Welcome' }}
+        component={HomeScreen}
+        // options={{ title: 'Welcome' }}
         />
-        
+        <Stack.Screen
+        name="Levels"
+        component={LevelPage}
+        // options={{ title: 'Welcome' }}
+        />
+        <Stack.Screen
+        name="Questions"
+        component={QuestionPage}
+        // options={{ title: 'Welcome' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
