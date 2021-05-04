@@ -11,6 +11,3 @@
 ## Still needs to be added
 * Generating 10 questions per game
 * Beautify
-
-## Known issues
-* The timer doesn't stop at 0 and continues to negative numbers

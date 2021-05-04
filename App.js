@@ -59,6 +59,7 @@ function QuestionPage({ route, navigation }) {
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState('');
   const [displayTimer, setDisplayTimer] = useState(JSON.stringify(Number(timer)));
+  var t = null;
 
   function newNumbers() {
     let num1 = Math.floor(Math.random() * 12) + 1;
@@ -72,19 +73,23 @@ function QuestionPage({ route, navigation }) {
 
   function countdown() {
     if (timer > 0 && displayTimer > 0) {
-      setDisplayTimer(oldTime => oldTime - 1)
-      //console.log(displayTimer)
+      t = setTimeout(() => setDisplayTimer(displayTimer - 1), 1000);
     } else if (displayTimer <= 0) {
-      clearInterval(displayTimer);
+      clearTimeout(t);
       checkAnswer()
     }
   }
+
+  useEffect(() => {
+    countdown()
+  }, [displayTimer]);
 
   function checkAnswer() {
     setTimeout(function(){setUserAnswer("")}, 1000);
     setTimeout(function(){setFeedback('')}, 1000);
     setTimeout(function(){newNumbers()}, 1100);
     setTimeout(function(){setDisplayTimer(timer)}, 1100);
+    clearTimeout(t);
     if (userAnswer == solution){
       setFeedback('correct 🎉');
     }
@@ -95,12 +100,8 @@ function QuestionPage({ route, navigation }) {
 
   useEffect(() => {
     newNumbers() 
-    setInterval(function(){countdown()}, 1000)
+    //setInterval(function(){countdown()}, 1000)
   }, [])
-
-  useEffect(() => { 
-    //setTimeout(function(){countdown()}, 1000)
-  }, [displayTimer])
 
   useEffect(() => {
     if (question.randomSymbol == 0) {
