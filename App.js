@@ -27,19 +27,19 @@ function LevelPage({ navigation }) {
     <Button
       title="Easy"
       onPress={() =>
-        navigation.navigate('Questions', {difficulty: 0,})
+        navigation.navigate('Questions', {timer: -1,})
       }
     />
     <Button
       title="Medium"
       onPress={() =>
-        navigation.navigate('Questions', {difficulty: 1,})
+        navigation.navigate('Questions', {timer: 20,})
       }
     />
     <Button
       title="Hard"
       onPress={() =>
-        navigation.navigate('Questions', {difficulty: 2,})
+        navigation.navigate('Questions', {timer: 10,})
       }
     />
     </View>
@@ -47,7 +47,7 @@ function LevelPage({ navigation }) {
 }
 
 function QuestionPage({ route, navigation }) {
-  const { difficulty } = route.params;
+  const { timer } = route.params;
   const [text, setText] = useState('');
   const [question, setQuestion] = useState({
     "randomValue" : null,
@@ -58,21 +58,8 @@ function QuestionPage({ route, navigation }) {
   const [solution, setSolution] = useState('');
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState('');
+  const [displayTimer, setDisplayTimer] = useState(JSON.stringify(Number(timer)));
 
-  function checkAnswer() {
-    if (userAnswer == solution){
-      setFeedback('correct 🎉');
-      setTimeout(function(){setUserAnswer("")}, 1000);
-      setTimeout(function(){setFeedback('')}, 1000);
-      setTimeout(function(){newNumbers()}, 1100);
-    }
-    else {
-      setFeedback('incorrect ❌')
-      setTimeout(function(){setUserAnswer("")}, 1000);
-      setTimeout(function(){setFeedback('')}, 1000);
-    }
-  }
-  
   function newNumbers() {
     let num1 = Math.floor(Math.random() * 12) + 1;
     let num2 = Math.floor(Math.random() * 12) + 1;
@@ -83,9 +70,37 @@ function QuestionPage({ route, navigation }) {
     })
   }
 
+  function countdown() {
+    if (timer > 0 && displayTimer > 0) {
+      setDisplayTimer(oldTime => oldTime - 1)
+      //console.log(displayTimer)
+    } else if (displayTimer <= 0) {
+      clearInterval(displayTimer);
+      checkAnswer()
+    }
+  }
+
+  function checkAnswer() {
+    setTimeout(function(){setUserAnswer("")}, 1000);
+    setTimeout(function(){setFeedback('')}, 1000);
+    setTimeout(function(){newNumbers()}, 1100);
+    setTimeout(function(){setDisplayTimer(timer)}, 1100);
+    if (userAnswer == solution){
+      setFeedback('correct 🎉');
+    }
+    else {
+      setFeedback('incorrect ❌')
+    }
+  }
+
   useEffect(() => {
-    newNumbers()  
+    newNumbers() 
+    setInterval(function(){countdown()}, 1000)
   }, [])
+
+  useEffect(() => { 
+    //setTimeout(function(){countdown()}, 1000)
+  }, [displayTimer])
 
   useEffect(() => {
     if (question.randomSymbol == 0) {
@@ -103,10 +118,11 @@ function QuestionPage({ route, navigation }) {
 
   return (
   <View style={styles.container}>
-  <Text>difficulty: {JSON.stringify(difficulty)}</Text>
+  <Text>timer: { displayTimer }</Text>
   <Text>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
   <Text>{ solution }</Text>
     <View style={styles.inputContainer}>
+      <form>
       <TextInput style={styles.inputBox}
       value={userAnswer}
       placeholder="Enter your answer here!"
@@ -118,7 +134,9 @@ function QuestionPage({ route, navigation }) {
       <Button
       title="Enter" 
       onPress={checkAnswer}
+      type="submit"
       />
+      </form>
     </View>
   <Text>{ feedback }</Text>
   {/* <StatusBar style="auto" /> */}
