@@ -59,6 +59,8 @@ function QuestionPage({ route, navigation }) {
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState('');
   const [displayTimer, setDisplayTimer] = useState(JSON.stringify(Number(timer)));
+  const [isVisible, setIsVisible] = useState(true);
+  
   var t = null;
 
   function newNumbers() {
@@ -74,11 +76,14 @@ function QuestionPage({ route, navigation }) {
   function countdown() {
     if (timer > 0 && displayTimer > 0) {
       t = setTimeout(() => setDisplayTimer(displayTimer - 1), 1000);
-    } else if (displayTimer <= 0) {
+    } else if (timer > 0 && displayTimer <= 0) {
       clearTimeout(t);
       checkAnswer()
+    } else {
+        setIsVisible(!isVisible);
+      };
     }
-  }
+  
 
   useEffect(() => {
     countdown()
@@ -88,8 +93,10 @@ function QuestionPage({ route, navigation }) {
     setTimeout(function(){setUserAnswer("")}, 1000);
     setTimeout(function(){setFeedback('')}, 1000);
     setTimeout(function(){newNumbers()}, 1100);
-    setTimeout(function(){setDisplayTimer(timer)}, 1100);
-    clearTimeout(t);
+    if (timer > 0) {
+      setTimeout(function(){setDisplayTimer(timer)}, 1100);
+      clearTimeout(t);
+    }
     if (userAnswer == solution){
       setFeedback('correct 🎉');
     }
@@ -119,7 +126,7 @@ function QuestionPage({ route, navigation }) {
 
   return (
   <View style={styles.container}>
-  <Text>timer: { displayTimer }</Text>
+  {isVisible ? <Text style={styles.text}>timer: { displayTimer }</Text> : null}
   <Text>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
   <Text>{ solution }</Text>
     <View style={styles.inputContainer}>
