@@ -60,8 +60,11 @@ function QuestionPage({ route, navigation }) {
   const [feedback, setFeedback] = useState('');
   const [displayTimer, setDisplayTimer] = useState(JSON.stringify(Number(timer)));
   const [isVisible, setIsVisible] = useState(true);
-  
-  var t = null;
+  var t = null
+  //keep count of the questions
+  const [questionCount, setQuestionCount] = useState(0);
+  //count the questions correctly answered
+  const [correctCount, setCorrectCount] = useState(0);
 
   function newNumbers() {
     let num1 = Math.floor(Math.random() * 12) + 1;
@@ -75,7 +78,9 @@ function QuestionPage({ route, navigation }) {
 
   function countdown() {
     if (timer > 0 && displayTimer > 0) {
-      t = setTimeout(() => setDisplayTimer(displayTimer - 1), 1000);
+      t = setTimeout(() => {
+        setDisplayTimer((displayTimer) => displayTimer - 1)
+      }, 1000)
     } else if (timer > 0 && displayTimer <= 0) {
       clearTimeout(t);
       checkAnswer()
@@ -83,31 +88,42 @@ function QuestionPage({ route, navigation }) {
         setIsVisible(!isVisible);
       };
     }
-  
 
   useEffect(() => {
     countdown()
   }, [displayTimer]);
 
+  useEffect(() => {
+    if (questionCount >= 10){
+      navigation.navigate('Scores', {correct: correctCount,})
+    }      
+  })
+
   function checkAnswer() {
     setTimeout(function(){setUserAnswer("")}, 1000);
     setTimeout(function(){setFeedback('')}, 1000);
     setTimeout(function(){newNumbers()}, 1100);
-    if (timer > 0) {
-      setTimeout(function(){setDisplayTimer(timer)}, 1100);
-      clearTimeout(t);
-    }
+    setQuestionCount(questionCount + 1);
+    // if (timer > 0) {
+    //   setDisplayTimer(timer);
+    //   clearTimeout(t);
+    //   //console.log(t);
+    // }
     if (userAnswer == solution){
+      setDisplayTimer(timer);
+      clearTimeout(t);
       setFeedback('correct 🎉');
+      setCorrectCount(correctCount + 1)
     }
     else {
       setFeedback('incorrect ❌')
+      setDisplayTimer(timer);
+      clearTimeout(t);
     }
   }
 
   useEffect(() => {
-    newNumbers() 
-    //setInterval(function(){countdown()}, 1000)
+    newNumbers()
   }, [])
 
   useEffect(() => {
@@ -127,10 +143,11 @@ function QuestionPage({ route, navigation }) {
   return (
   <View style={styles.container}>
   {isVisible ? <Text style={styles.text}>timer: { displayTimer }</Text> : null}
+  <Text>question number: { questionCount + 1 }</Text>
+  <Text>questions correct: { correctCount + 1 }</Text>
   <Text>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
   <Text>{ solution }</Text>
     <View style={styles.inputContainer}>
-      <form>
       <TextInput style={styles.inputBox}
       value={userAnswer}
       placeholder="Enter your answer here!"
@@ -144,7 +161,6 @@ function QuestionPage({ route, navigation }) {
       onPress={checkAnswer}
       type="submit"
       />
-      </form>
     </View>
   <Text>{ feedback }</Text>
   {/* <StatusBar style="auto" /> */}
@@ -152,8 +168,19 @@ function QuestionPage({ route, navigation }) {
   );
 }
 
-function ScorePage({ navigation }) {
-
+function ScorePage({ route, navigation }) {
+  const { correct } = route.params;
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>You scored: { JSON.stringify(Number(correct)) }/10</Text>
+      <Button
+      title="Play Again"
+      onPress={() =>
+        navigation.navigate('Levels')
+      }
+      />
+    </View>
+  );
 }
 
 export default function App() {
@@ -176,6 +203,11 @@ export default function App() {
         <Stack.Screen
         name="Questions"
         component={QuestionPage}
+        // options={{ title: 'Welcome' }}
+        />
+        <Stack.Screen
+        name="Scores"
+        component={ScorePage}
         // options={{ title: 'Welcome' }}
         />
       </Stack.Navigator>
