@@ -74,6 +74,9 @@ function QuestionPage({ route, navigation }) {
     "randomValue2" : num2,
     "randomSymbol" : sym,
     })
+    if (timer < 0) {
+      setIsVisible(false);
+    };
   }
 
   function countdown() {
@@ -85,7 +88,7 @@ function QuestionPage({ route, navigation }) {
       clearTimeout(t);
       checkAnswer()
     } else {
-        setIsVisible(!isVisible);
+        setIsVisible(false);
       };
     }
 
@@ -107,7 +110,6 @@ function QuestionPage({ route, navigation }) {
     // if (timer > 0) {
     //   setDisplayTimer(timer);
     //   clearTimeout(t);
-    //   //console.log(t);
     // }
     if (userAnswer == solution){
       setDisplayTimer(timer);
