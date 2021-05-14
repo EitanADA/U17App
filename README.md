@@ -12,3 +12,5 @@
 
 ## Still needs to be added
 * Beautify
+* Add images
+* Add sounds

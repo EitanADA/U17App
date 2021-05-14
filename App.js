@@ -1,25 +1,63 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, Component } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, Alert, Keyboard, } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, Alert, Keyboard, Dimensions, Platform, PixelRatio, TouchableOpacity } from 'react-native';
 import 'react-native-gesture-handler';
 import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { diff } from 'react-native-reanimated';
+import { diff } from 'react-native-reanimated';;
+import AppLoading from 'expo-app-loading';
+import {
+  useFonts,
+  FredokaOne_400Regular 
+} from '@expo-google-fonts/fredoka-one'
+import { 
+  Nunito_200ExtraLight,
+  Nunito_200ExtraLight_Italic,
+  Nunito_300Light,
+  Nunito_300Light_Italic,
+  Nunito_400Regular,
+  Nunito_400Regular_Italic,
+  Nunito_600SemiBold,
+  Nunito_600SemiBold_Italic,
+  Nunito_700Bold,
+  Nunito_700Bold_Italic,
+  Nunito_800ExtraBold,
+  Nunito_800ExtraBold_Italic,
+  Nunito_900Black,
+  Nunito_900Black_Italic 
+} from '@expo-google-fonts/nunito'
 
 function HomeScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Maths Game</Text>
-      <Button
-      title="Play"
-      onPress={() =>
-        navigation.navigate('Levels')
-      }
-      />
-    </View>
-  );
-}
+  
+  function calcSize(size) {
+    if (Platform.OS === 'ios') {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320))
+    } else {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320)) - 2
+    }
+  }
+
+  let [fontsLoaded] = useFonts({
+    FredokaOne_400Regular,
+    Nunito_400Regular,});
+  
+    if (!fontsLoaded) {
+      return <AppLoading />;
+    } else {
+      return (
+      <View style={{flex: 1, backgroundColor: "#75DDDD", alignItems: 'center', justifyContent: 'center'}}>
+        <Text style={{fontFamily: "FredokaOne_400Regular", color: "white", fontSize: calcSize(40)}}>Maths Master</Text>
+        <TouchableOpacity>
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(35)}}
+        onPress={() =>
+          navigation.navigate('Levels')
+        }>Play</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+};
 
 function LevelPage({ navigation }) {
   return (
