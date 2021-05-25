@@ -1,35 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect, Component } from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, Alert, Keyboard, Dimensions, Platform, PixelRatio, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, } from 'react';
+import { StyleSheet, Text, TextInput, View, Dimensions, Platform, PixelRatio, TouchableOpacity } from 'react-native';
 import 'react-native-gesture-handler';
-import { NavigationContainer, StackActions } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { diff } from 'react-native-reanimated';;
 import AppLoading from 'expo-app-loading';
+
 import {
   useFonts,
   FredokaOne_400Regular 
 } from '@expo-google-fonts/fredoka-one'
 import { 
-  Nunito_200ExtraLight,
-  Nunito_200ExtraLight_Italic,
-  Nunito_300Light,
-  Nunito_300Light_Italic,
   Nunito_400Regular,
-  Nunito_400Regular_Italic,
-  Nunito_600SemiBold,
-  Nunito_600SemiBold_Italic,
-  Nunito_700Bold,
-  Nunito_700Bold_Italic,
-  Nunito_800ExtraBold,
-  Nunito_800ExtraBold_Italic,
-  Nunito_900Black,
-  Nunito_900Black_Italic 
 } from '@expo-google-fonts/nunito'
 
 function HomeScreen({ navigation }) {
-  
   function calcSize(size) {
     if (Platform.OS === 'ios') {
       return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320))
@@ -49,7 +33,7 @@ function HomeScreen({ navigation }) {
       <View style={{flex: 1, backgroundColor: "#75DDDD", alignItems: 'center', justifyContent: 'center'}}>
         <Text style={{fontFamily: "FredokaOne_400Regular", color: "white", fontSize: calcSize(40)}}>Maths Master</Text>
         <TouchableOpacity>
-        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(35)}}
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(35),paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#ffaa5d",}}
         onPress={() =>
           navigation.navigate('Levels')
         }>Play</Text>
@@ -60,26 +44,63 @@ function HomeScreen({ navigation }) {
 };
 
 function LevelPage({ navigation }) {
+  function calcSize(size) {
+    if (Platform.OS === 'ios') {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320))
+    } else {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320)) - 2
+    }
+  }
+  
   return (
-    <View>
-    <Button
-      title="Easy"
-      onPress={() =>
-        navigation.navigate('Questions', {timer: -1,})
-      }
-    />
-    <Button
-      title="Medium"
-      onPress={() =>
-        navigation.navigate('Questions', {timer: 20,})
-      }
-    />
-    <Button
-      title="Hard"
-      onPress={() =>
-        navigation.navigate('Questions', {timer: 10,})
-      }
-    />
+
+
+    <View style={{alignItems: 'center', justifyContent: 'center', backgroundColor: "#FF729F", flex: 1,}}>      
+      <View style={{paddingHorizontal: 20, paddingVertical: 20, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#9368B7",}}>
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(35),}}>
+          Choose a Level:
+        </Text>
+      </View>
+      <View>
+        <Text style={{paddingVertical: 20}}>{"\n"}</Text>
+      </View>
+      <View style={{paddingHorizontal: 30, paddingVertical: 20, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#9368B7", width: '60%',}}>
+        <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('Questions', {timer: -1,})
+        }>
+          <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(30),}}>
+            Easy
+          </Text>
+          <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(20),}}>No timer</Text>
+        </TouchableOpacity>
+      </View>
+      <View>
+        <Text>{"\n"}</Text>
+      </View>
+      <View style={{paddingHorizontal: 30, paddingVertical: 20, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#9368B7", width: '60%',}}>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('Questions', {timer: 20,})
+        }>
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(30),}}>
+        Medium</Text>
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(20),}}>20 second timer</Text>
+        </TouchableOpacity>
+      </View>
+      <View>
+        <Text>{"\n"}</Text>
+      </View>
+      <View style={{paddingHorizontal: 30, paddingVertical: 20, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#9368B7", width: '60%',}}>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('Questions', {timer: 10,})
+        }>
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(30),}}>
+        Hard</Text>
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(20),}}>10 second timer</Text>
+      </TouchableOpacity>
+    </View>
     </View>
   );
 }
@@ -141,24 +162,26 @@ function QuestionPage({ route, navigation }) {
   })
 
   function checkAnswer() {
-    setTimeout(function(){setUserAnswer("")}, 1000);
-    setTimeout(function(){setFeedback('')}, 1000);
-    setTimeout(function(){newNumbers()}, 1100);
+    //setTimeout(function(){setFeedback('')}, 1000);
+    setUserAnswer("");
+    newNumbers();
+    if (questionCount < 10) {
     setQuestionCount(questionCount + 1);
-    // if (timer > 0) {
-    //   setDisplayTimer(timer);
-    //   clearTimeout(t);
-    // }
-    if (userAnswer == solution){
+    }
+    if (timer > 0) {
       setDisplayTimer(timer);
       clearTimeout(t);
+    }
+    if (userAnswer == solution && userAnswer != null){
       setFeedback('correct 🎉');
       setCorrectCount(correctCount + 1)
+      clearTimeout(t);
+      setDisplayTimer(timer);
     }
     else {
       setFeedback('incorrect ❌')
-      setDisplayTimer(timer);
       clearTimeout(t);
+      setDisplayTimer(timer);
     }
   }
 
@@ -180,45 +203,74 @@ function QuestionPage({ route, navigation }) {
     }
   }, [question])
 
+  function calcSize(size) {
+    if (Platform.OS === 'ios') {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320))
+    } else {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320)) - 2
+    }
+  }
+
   return (
-  <View style={styles.container}>
-  {isVisible ? <Text style={styles.text}>timer: { displayTimer }</Text> : null}
-  <Text>question number: { questionCount + 1 }</Text>
-  <Text>questions correct: { correctCount + 1 }</Text>
-  <Text>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
-  <Text>{ solution }</Text>
+  <View style={{flex: 1, backgroundColor: '#F4F1BB', alignItems: 'center', justifyContent: 'center',}}>
+
+  {isVisible ? <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(20),}}>timer: { displayTimer }</Text> : null}
+  
+  <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(20),}}>You have got { correctCount }/{ questionCount + 1 } correct</Text>
+
+  <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(60),}}>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
+
     <View style={styles.inputContainer}>
-      <TextInput style={styles.inputBox}
+
+      <TextInput
       value={userAnswer}
       placeholder="Enter your answer here!"
       onChangeText={userAnswer => setUserAnswer(userAnswer)}
       defaultValue={text}
       autoFocus={true}
-      keyboardType={'numeric'}>
+      keyboardType={'numeric'}
+      onSubmitEditing={() => checkAnswer}
+      style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(20), borderWidth: 2, borderRadius: 5, borderStyle: 'dashed', textAlign: 'center',}}>
       </TextInput>
-      <Button
-      title="Enter" 
-      onPress={checkAnswer}
-      type="submit"
-      />
+
+      <TouchableOpacity
+        onPress={checkAnswer}
+        type="submit">
+        <Text  
+        style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(27), backgroundColor: "#9100da", borderRadius: 20, elevation: 4, textAlign: 'center', padding: 5, color: '#fff',}}>
+        Enter</Text>
+      </TouchableOpacity>
+
     </View>
-  <Text>{ feedback }</Text>
-  {/* <StatusBar style="auto" /> */}
+  <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(25),}}>{ feedback }</Text>
   </View>
   );
 }
 
 function ScorePage({ route, navigation }) {
+
+  function calcSize(size) {
+    if (Platform.OS === 'ios') {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320))
+    } else {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320)) - 2
+    }
+  }
+
   const { correct } = route.params;
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>You scored: { JSON.stringify(Number(correct)) }/10</Text>
-      <Button
-      title="Play Again"
-      onPress={() =>
-        navigation.navigate('Levels')
-      }
-      />
+    <View style={{flex: 1, backgroundColor: '#698F3F', alignItems: 'center', justifyContent: 'center',}}>
+      <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(25),}}>You scored:</Text>
+      <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(40),}}> { JSON.stringify(Number(correct)) }/10</Text>
+      
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('Levels')
+        }>
+        <Text  
+        style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(27), backgroundColor: "#ffaa5d", borderRadius: 20, elevation: 4, textAlign: 'center', padding: 5, color: '#000',}}>
+        Play Again</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -233,22 +285,20 @@ export default function App() {
         <Stack.Screen
         name="Home"
         component={HomeScreen}
-        // options={{ title: 'Welcome' }}
         />
         <Stack.Screen
         name="Levels"
         component={LevelPage}
-        // options={{ title: 'Welcome' }}
+        options={{headerShown: false}}
         />
         <Stack.Screen
         name="Questions"
         component={QuestionPage}
-        // options={{ title: 'Welcome' }}
         />
         <Stack.Screen
         name="Scores"
         component={ScorePage}
-        // options={{ title: 'Welcome' }}
+        options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -258,12 +308,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F4F1BB',
     alignItems: 'center',
     justifyContent: 'center',
   },
   inputBox: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 5,
     borderStyle: 'dashed',
     textAlign: 'center'
