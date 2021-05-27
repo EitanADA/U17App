@@ -10,7 +10,6 @@
 * 10 questions per game
 * Scores displayed at the end
 
-## Still needs to be added
-* Beautify
-* Add images
-* Add sounds
+## Doesn't work
+* Images
+* Sounds

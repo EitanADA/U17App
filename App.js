@@ -1,9 +1,10 @@
 import React, { useState, useEffect, } from 'react';
-import { StyleSheet, Text, TextInput, View, Dimensions, Platform, PixelRatio, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Dimensions, Platform, PixelRatio, TouchableOpacity, Image, } from 'react-native';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AppLoading from 'expo-app-loading';
+import { Audio } from 'expo-av';
 
 import {
   useFonts,
@@ -14,6 +15,23 @@ import {
 } from '@expo-google-fonts/nunito'
 
 function HomeScreen({ navigation }) {
+
+  const [sound, setSound] = React.useState();
+
+  async function playSound() {
+    const { sound } = await Audio.Sound.createAsync(
+       require('./assets/whoosh.mp3')
+    );
+    setSound(sound);
+    await sound.playAsync(); }
+
+  React.useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync(); }
+      : undefined;
+  }, [sound]);
+
   function calcSize(size) {
     if (Platform.OS === 'ios') {
       return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320))
@@ -34,9 +52,12 @@ function HomeScreen({ navigation }) {
         <Text style={{fontFamily: "FredokaOne_400Regular", color: "white", fontSize: calcSize(40)}}>Maths Master</Text>
         <TouchableOpacity>
         <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(35),paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#ffaa5d",}}
-        onPress={() =>
+        onPress={() => {
+          playSound()
           navigation.navigate('Levels')
-        }>Play</Text>
+          }}>
+        Play
+        </Text>
         </TouchableOpacity>
       </View>
     );
@@ -52,8 +73,24 @@ function LevelPage({ navigation }) {
     }
   }
   
-  return (
+  const [sound, setSound] = React.useState();
 
+  async function playSound() {
+    const { sound } = await Audio.Sound.createAsync(
+       require('./assets/select.mp3')
+    );
+    setSound(sound);
+    await sound.playAsync(); }
+
+  React.useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync(); }
+      : undefined;
+  }, [sound]);
+
+
+  return (
 
     <View style={{alignItems: 'center', justifyContent: 'center', backgroundColor: "#FF729F", flex: 1,}}>      
       <View style={{paddingHorizontal: 20, paddingVertical: 20, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#9368B7",}}>
@@ -66,9 +103,10 @@ function LevelPage({ navigation }) {
       </View>
       <View style={{paddingHorizontal: 30, paddingVertical: 20, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#9368B7", width: '60%',}}>
         <TouchableOpacity
-        onPress={() =>
+        onPress={() => {
+          playSound()
           navigation.navigate('Questions', {timer: -1,})
-        }>
+        }}>
           <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(30),}}>
             Easy
           </Text>
@@ -125,6 +163,26 @@ function QuestionPage({ route, navigation }) {
   //count the questions correctly answered
   const [correctCount, setCorrectCount] = useState(0);
 
+  // const [sound2, setSound2] = React.useState();
+
+  // async function wrongSound() {
+  //   const { sound: sound2 } = await Audio.Sound.createAsync(
+  //      require('./assets/wrong.mp3')
+  //   );
+  //   setSound2(sound2);
+  //   await sound2.playAsync(); }
+
+  // React.useEffect(() => {
+  //   return sound2
+  //     ? () => {
+  //         sound2.unloadAsync(); }
+  //     : undefined;
+  //   }, [sound2]);
+
+  const applauseSound = new Audio.Sound(require('./assets/applause.mp3'));
+  const wrongSound = new Audio.Sound(require('./assets/wrong.mp3'));
+  //setSound(sound);
+
   function newNumbers() {
     let num1 = Math.floor(Math.random() * 12) + 1;
     let num2 = Math.floor(Math.random() * 12) + 1;
@@ -168,6 +226,7 @@ function QuestionPage({ route, navigation }) {
     if (questionCount < 10) {
     setQuestionCount(questionCount + 1);
     }
+
     if (timer > 0) {
       setDisplayTimer(timer);
       clearTimeout(t);
@@ -177,11 +236,13 @@ function QuestionPage({ route, navigation }) {
       setCorrectCount(correctCount + 1)
       clearTimeout(t);
       setDisplayTimer(timer);
+      applauseSound.playSound();
     }
     else {
       setFeedback('incorrect ❌')
       clearTimeout(t);
       setDisplayTimer(timer);
+      wrongSound.playSound();
     }
   }
 
@@ -257,12 +318,25 @@ function ScorePage({ route, navigation }) {
     }
   }
 
+  useEffect(() => {
+    feedbackImage()
+  }, []);
+
   const { correct } = route.params;
+
+  function feedbackImage(props) {
+    if (JSON.stringify(Number(correct)) > 7) {
+      return(<Image style={{ width: 200, height: 200 }} source={require('./assets/thumbs_up.png')}/>)
+    } else {
+      return(<Image style={{ width: 200, height: 200 }} source={require('./assets/thumbs_down.png')}/>);
+    }
+  }
+  
   return (
     <View style={{flex: 1, backgroundColor: '#698F3F', alignItems: 'center', justifyContent: 'center',}}>
       <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(25),}}>You scored:</Text>
       <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(40),}}> { JSON.stringify(Number(correct)) }/10</Text>
-      
+
       <TouchableOpacity
         onPress={() =>
           navigation.navigate('Levels')
