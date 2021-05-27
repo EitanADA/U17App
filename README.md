@@ -9,7 +9,7 @@
 * A timer has been added and will count down from the selected times entered
 * 10 questions per game
 * Scores displayed at the end
+* Sounds
 
 ## Doesn't work
 * Images
-* Sounds

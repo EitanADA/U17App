@@ -5,6 +5,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AppLoading from 'expo-app-loading';
 import { Audio } from 'expo-av';
+import SoundComponent from './sound';
+import wrongSound from './assets/wrong.mp3';
+import correctSound from './assets/button.mp3';
 
 import {
   useFonts,
@@ -17,6 +20,7 @@ import {
 function HomeScreen({ navigation }) {
 
   const [sound, setSound] = React.useState();
+  const [sound2, setSound2] = React.useState();
 
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
@@ -31,6 +35,52 @@ function HomeScreen({ navigation }) {
           sound.unloadAsync(); }
       : undefined;
   }, [sound]);
+
+  function calcSize(size) {
+    if (Platform.OS === 'ios') {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320))
+    } else {
+      return Math.round(PixelRatio.roundToNearestPixel(size * Dimensions.get('window').width / 320)) - 2
+    }
+  }
+
+  let [fontsLoaded] = useFonts({
+    FredokaOne_400Regular,
+    Nunito_400Regular,});
+  
+    if (!fontsLoaded) {
+      return <AppLoading />;
+    } else {
+      return (
+      <View style={{flex: 1, backgroundColor: "#75DDDD", alignItems: 'center', justifyContent: 'center'}}>
+        <Text style={{fontFamily: "FredokaOne_400Regular", color: "white", fontSize: calcSize(40)}}>Maths Master</Text>
+        <TouchableOpacity>
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(35),paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#ffaa5d",}}
+        onPress={() => {
+          playSound()
+          navigation.navigate('Levels')
+          }}>
+        Start
+        </Text>
+        </TouchableOpacity>
+        <View>
+        <Text>{"\n"}</Text>
+      </View>
+        <TouchableOpacity>
+        <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(25),paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, elevation: 4, textAlign: 'center', backgroundColor: "#ffaa5d",}}
+        onPress={() => {
+          playSound()
+          navigation.navigate('Tutorial')
+          }}>
+        How to Play
+        </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+};
+
+function Tutorial({ navigation }) {
 
   function calcSize(size) {
     if (Platform.OS === 'ios') {
@@ -74,6 +124,7 @@ function LevelPage({ navigation }) {
   }
   
   const [sound, setSound] = React.useState();
+  const [sound2, setSound2] = React.useState();
 
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
@@ -151,6 +202,10 @@ function QuestionPage({ route, navigation }) {
     "randomValue2" : null,
     "randomSymbol" : null,
   });
+
+  const [sound, setSound] = useState(false);
+  const [sound2, setSound2] = useState(false);
+
   const symbolTypes = ["+","-","×","÷"];
   const [solution, setSolution] = useState('');
   const [userAnswer, setUserAnswer] = useState('');
@@ -162,26 +217,6 @@ function QuestionPage({ route, navigation }) {
   const [questionCount, setQuestionCount] = useState(0);
   //count the questions correctly answered
   const [correctCount, setCorrectCount] = useState(0);
-
-  // const [sound2, setSound2] = React.useState();
-
-  // async function wrongSound() {
-  //   const { sound: sound2 } = await Audio.Sound.createAsync(
-  //      require('./assets/wrong.mp3')
-  //   );
-  //   setSound2(sound2);
-  //   await sound2.playAsync(); }
-
-  // React.useEffect(() => {
-  //   return sound2
-  //     ? () => {
-  //         sound2.unloadAsync(); }
-  //     : undefined;
-  //   }, [sound2]);
-
-  const applauseSound = new Audio.Sound(require('./assets/applause.mp3'));
-  const wrongSound = new Audio.Sound(require('./assets/wrong.mp3'));
-  //setSound(sound);
 
   function newNumbers() {
     let num1 = Math.floor(Math.random() * 12) + 1;
@@ -210,18 +245,19 @@ function QuestionPage({ route, navigation }) {
     }
 
   useEffect(() => {
-    countdown()
-  }, [displayTimer]);
+    if (questionCount < 10)
+    {countdown()}
+   }, [displayTimer, questionCount]);
 
   useEffect(() => {
     if (questionCount >= 10){
       navigation.navigate('Scores', {correct: correctCount,})
-    }      
+    } 
   })
 
   function checkAnswer() {
     //setTimeout(function(){setFeedback('')}, 1000);
-    setUserAnswer("");
+    
     newNumbers();
     if (questionCount < 10) {
     setQuestionCount(questionCount + 1);
@@ -236,13 +272,15 @@ function QuestionPage({ route, navigation }) {
       setCorrectCount(correctCount + 1)
       clearTimeout(t);
       setDisplayTimer(timer);
-      applauseSound.playSound();
+      setSound2(true);
+      setUserAnswer("");
     }
     else {
       setFeedback('incorrect ❌')
       clearTimeout(t);
       setDisplayTimer(timer);
-      wrongSound.playSound();
+      setSound(true);
+      setUserAnswer("");
     }
   }
 
@@ -282,7 +320,6 @@ function QuestionPage({ route, navigation }) {
   <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(60),}}>{question.randomValue} {symbolTypes[question.randomSymbol]} {question.randomValue2}</Text>
 
     <View style={styles.inputContainer}>
-
       <TextInput
       value={userAnswer}
       placeholder="Enter your answer here!"
@@ -290,7 +327,6 @@ function QuestionPage({ route, navigation }) {
       defaultValue={text}
       autoFocus={true}
       keyboardType={'numeric'}
-      onSubmitEditing={() => checkAnswer}
       style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(20), borderWidth: 2, borderRadius: 5, borderStyle: 'dashed', textAlign: 'center',}}>
       </TextInput>
 
@@ -300,10 +336,12 @@ function QuestionPage({ route, navigation }) {
         <Text  
         style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(27), backgroundColor: "#9100da", borderRadius: 20, elevation: 4, textAlign: 'center', padding: 5, color: '#fff',}}>
         Enter</Text>
-      </TouchableOpacity>
-
+      </TouchableOpacity> 
     </View>
   <Text style={{fontFamily: "Nunito_400Regular", fontSize: calcSize(25),}}>{ feedback }</Text>
+
+  {sound ? (<SoundComponent sound={wrongSound} soundState={setSound}></SoundComponent>):(null)}
+  {sound2 ? (<SoundComponent sound={correctSound} soundState={setSound2}></SoundComponent>):(null)}  
   </View>
   );
 }
@@ -359,6 +397,10 @@ export default function App() {
         <Stack.Screen
         name="Home"
         component={HomeScreen}
+        />
+        <Stack.Screen
+        name="Tutorial"
+        component={Tutorial}
         />
         <Stack.Screen
         name="Levels"
